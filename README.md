@@ -1,7 +1,7 @@
 # CUDA 
 -------------------------------------------------------------------------------
 ### Overview for addition program:
-This program demonstrates a basic CUDA implementation for vector addition. It uses the GPU to parallelize computations,
+####This program demonstrates a basic CUDA implementation for vector addition. It uses the GPU to parallelize computations,
 ---
 Day 1:
 ### Theoretical Learnings : 
