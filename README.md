@@ -1,9 +1,9 @@
 # CUDA 
 -------------------------------------------------------------------------------
 ### Overview for addition program:
-####This program demonstrates a basic CUDA implementation for vector addition. It uses the GPU to parallelize computations,
+###This program demonstrates a basic CUDA implementation for vector addition. It uses the GPU to parallelize computations,
 ---
-Day 1:
+###Day 1:
 ### Theoretical Learnings : 
 - CUDA requires explicit memory management between the host (CPU) and the device (GPU).
 - Threads and blocks enable parallel processing by dividing data across the GPU.
@@ -12,8 +12,8 @@ Day 1:
 - Machine code for the kernel is stored in the GPU's instruction cache for execution.
 ---------------------------------------------------------------------------------
 
-Day 5: Understanding Row and Column Indexing in 1D Memory 
-
+###Day 5: Understanding Row and Column Indexing in 1D Memory (In context to Shared Matrix Multiplication)
+Let's assume we have 1 grid, 2 blocks, 16 threads per each.So, we have BlockSize of 2, threadIdx ranging from 0 - 15, n is matrix size where it is equal to thread counts, k is ranging from 0 - BlockSize-1.
 ## How Rows and Columns are Handled in 1D Memory
 When working with CUDA, a **2D matrix is stored in a 1D memory layout**. To efficiently access elements, we need to compute the correct **row and column indices** in terms of memory addresses. This is done using **thread and block indices**.
 
@@ -23,7 +23,7 @@ Each thread computes its **row index** using:
 int row = blockIdx.y * blockDim.y + threadIdx.y;
 ```
 - `blockIdx.y * blockDim.y` gives the **starting row index for a block ( we get 0 - 1 in our case) .**.
-- `threadIdx.y` adds the **thread index within the block**, resulting in the actual **global row index (0 -31 in our case)**.
+- `threadIdx.y` adds the **thread index within the block**, resulting in the actual **global row index (0 - 31 in our case)**.
 
 Thus, **all row indices** are generated correctly for **each thread across all blocks**.
 
@@ -33,9 +33,9 @@ To get the **correct memory location** in 1D, we use:
 sharedA[threadIdx.y][threadIdx.x] = A[row * n + k * BLOCK_SIZE + threadIdx.x];
 ```
 Breaking it down:
-- `row * n`: Since **each row has `n` elements**, multiplying by `n` gives the **starting index of that row** in 1D memory.
-- `k * BLOCK_SIZE`: This adds an **offset for the block-wise shift**, ensuring correct indexing within each tile.
-- `threadIdx.x`: Finally, this **adds the column offset** for the specific thread.
+- `row * n`: Since **each row has `n` elements**, multiplying by `n` gives the **starting index of that row** in 1D memory[..(0-15)x16..].
+- `k * BLOCK_SIZE`: This adds an **offset for the block-wise shift**, ensuring correct indexing within each tile[..(0-1)x2..].
+- `threadIdx.x`: Finally, this **adds the column offset** for the specific thread[0-15].
 
 Thus, the complete indexing formula ensures that each thread fetches the correct matrix element.
 
@@ -66,7 +66,9 @@ __shared__ float sharedA[BLOCK_SIZE][BLOCK_SIZE];
 - **Row indices** are computed using `blockIdx.y * blockDim.y + threadIdx.y`.
 - **1D memory indexing** is handled by `row * n + k * BLOCK_SIZE + threadIdx.x`.
 - **Shared memory is allocated per block**, ensuring efficient memory access and avoiding redundant global memory accesses.
+- 
 (since the internal parallelism is a stress for warps and threads, we are free!!)
+
 This ensures efficient parallel computation on a **2D matrix using CUDA**. 
 
 
